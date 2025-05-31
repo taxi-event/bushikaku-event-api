@@ -1,7 +1,7 @@
 
 services:
   - type: web
-    name: event-api
+    name: event-api-lightweight
     env: node
     buildCommand: "npm install"
     startCommand: "node index.js"
