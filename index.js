@@ -17,6 +17,7 @@ app.get("/events", async (req, res) => {
     const $ = cheerio.load(response.data);
     const result = [];
 
+    // 対象その１：ライブ系イベント（従来）
     $(".live-schedule-item").each((i, el) => {
       const time = $(el).find(".time").text().trim();
       const venue = $(el).find(".venue").text().trim();
@@ -34,6 +35,30 @@ app.get("/events", async (req, res) => {
         }
         result.push({ venue, category, title, start, end });
       }
+    });
+
+    // 対象その２：文化・舞台系イベント（新規対応）
+    $(".expedition-event-item").each((i, el) => {
+      const title = $(el).find(".event-title").text().trim();
+      const dateRange = $(el).find(".event-date").text().trim();
+      const venue = $(el).find(".event-place").text().trim();
+      const category = $(el).find(".event-category").text().trim();
+
+      // 日付範囲から「当日・翌日」が対象か判定（簡易：範囲が today/tomorrow を含む）
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+
+      const dateText = dateRange.replace(/\s+/g, "");
+      if (!VENUES.includes(venue)) return;
+
+      result.push({
+        venue,
+        category,
+        title,
+        start: dateText,
+        end: null
+      });
     });
 
     res.json({ status: "ok", date: new Date().toISOString(), events: result });
