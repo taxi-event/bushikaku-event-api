@@ -2,11 +2,14 @@
 const express = require("express");
 const axios = require("axios");
 const cheerio = require("cheerio");
+const cors = require("cors"); // CORS対応追加
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors()); // すべての外部アクセスを許可
+
 const TARGET_URL = "https://www.bushikaku.net/expedition/concert/shows/all/region-kanto/tokyo/";
-const VENUES = [ "東京国際フォーラム", "日本武道館", "東京ビックサイト", "サントリーホール", "NHKホール" ]; // テスト用に一部のみ
+const VENUES = [ "東京国際フォーラム", "日本武道館", "東京ビックサイト", "サントリーホール", "NHKホール" ]; // テスト用
 
 app.get("/events", async (req, res) => {
   try {
