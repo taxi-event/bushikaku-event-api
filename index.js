@@ -11,8 +11,9 @@ const today = new Date();
 const tomorrow = new Date();
 tomorrow.setDate(today.getDate() + 1);
 
-function formatDate(date) {
-  return date.toISOString().split("T")[0];
+// 例: 6/2 の形式に変換
+function formatDateMD(date) {
+  return `${date.getMonth() + 1}/${date.getDate()}`;
 }
 
 async function getTokyoDomeEvents() {
@@ -21,15 +22,18 @@ async function getTokyoDomeEvents() {
   const $ = cheerio.load(data);
   const events = [];
 
-  $(".event-schedule__item").each((i, el) => {
-    const date = $(el).find(".event-schedule__date").text().trim().replace(/[年月]/g, "-").replace("日", "");
-    const title = $(el).find(".event-schedule__title").text().trim();
-    const rawTime = $(el).find(".event-schedule__time").text().trim();
+  const todayStr = formatDateMD(today);
+  const tomorrowStr = formatDateMD(tomorrow);
 
-    if (date === formatDate(today) || date === formatDate(tomorrow)) {
+  $(".event-schedule__item").each((i, el) => {
+    let dateText = $(el).find(".event-schedule__date").text().trim().replace(/\s/g, "").replace(/[年月]/g, "/").replace("日", "");
+
+    if (dateText === todayStr || dateText === tomorrowStr) {
+      const title = $(el).find(".event-schedule__title").text().trim();
+      const time = $(el).find(".event-schedule__time").text().trim();
       events.push({
-        date,
-        time: rawTime || "要確認",
+        date: dateText,
+        time: time || "要確認",
         venue: "東京ドーム",
         category: "イベント",
         title,
@@ -46,12 +50,15 @@ async function getBlueNoteEvents() {
   const $ = cheerio.load(data);
   const events = [];
 
-  $(".liveInfoList .list").each((i, el) => {
-    const dateText = $(el).find(".date").text().trim().replace(/[年月]/g, "-").replace("日", "");
-    const artist = $(el).find(".name").text().trim();
-    const time = $(el).find(".time").text().trim();
+  const todayStr = formatDateMD(today);
+  const tomorrowStr = formatDateMD(tomorrow);
 
-    if (dateText === formatDate(today) || dateText === formatDate(tomorrow)) {
+  $(".liveInfoList .list").each((i, el) => {
+    let dateText = $(el).find(".date").text().trim().replace(/\s/g, "").replace(/[年月]/g, "/").replace("日", "");
+
+    if (dateText === todayStr || dateText === tomorrowStr) {
+      const artist = $(el).find(".name").text().trim();
+      const time = $(el).find(".time").text().trim();
       events.push({
         date: dateText,
         time: time || "要確認",
@@ -71,14 +78,17 @@ async function getTokyoInternationalForumEvents() {
   const $ = cheerio.load(data);
   const events = [];
 
-  $(".eventList .eventItem").each((i, el) => {
-    const date = $(el).find(".eventDate").text().trim().split("（")[0];
-    const title = $(el).find(".eventTitle").text().trim();
-    const time = $(el).find(".eventTime").text().trim();
+  const todayStr = formatDateMD(today);
+  const tomorrowStr = formatDateMD(tomorrow);
 
-    if (date === formatDate(today) || date === formatDate(tomorrow)) {
+  $(".eventList .eventItem").each((i, el) => {
+    let dateText = $(el).find(".eventDate").text().trim().split("（")[0].replace(/[年月]/g, "/").replace("日", "").replace(/\s/g, "");
+
+    if (dateText === todayStr || dateText === tomorrowStr) {
+      const title = $(el).find(".eventTitle").text().trim();
+      const time = $(el).find(".eventTime").text().trim();
       events.push({
-        date,
+        date: dateText,
         time: time || "要確認",
         venue: "東京国際フォーラム",
         category: "イベント",
