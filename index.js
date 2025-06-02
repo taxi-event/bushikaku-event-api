@@ -1,3 +1,35 @@
+/*
+  ■ スクリプト仕様ガイドライン（bushikaku-event-api 用）
+  ----------------------------------------------------------------
+  このスクリプトは「https://www.bushikaku.net/expedition/concert/shows/all/region-kanto/tokyo/」に掲載されている
+  東京エリアのイベント情報から、以下の要件でイベントを抽出・整形し、APIとして提供する。
+
+  【抽出条件】
+  - 対象日は「本日」と「翌日」の2日分。
+  - 会場名が「会場リスト（全75件）」に含まれている場合のみ抽出対象。
+  - イベントの要素構造（クラス名等）は本ページのHTML構造に依存し、都度更新の必要がある。
+    ページ構造の一例：div.show-card、div.expedition-event-item、または将来的に別のクラス等。
+
+  【返却データ形式】
+  {
+    status: "ok",
+    date: ISODate形式,
+    events: [
+      {
+        title: イベント名,
+        category: ジャンル（例：ミュージカル、オーケストラ等）,
+        venue: 会場名,
+        date: 日付または開催期間の記述文字列
+      },
+      ...
+    ]
+  }
+
+  【注意点】
+  - セッションや共有状態が切れた場合でも、再利用者が本仕様を把握できるように本ヘッダを保持すること。
+  - 取得失敗時は HTML構造の変化を最優先で確認。
+  - 仮データは禁止。常にリアルデータで処理。
+*/
 
 const express = require("express");
 const axios = require("axios");
@@ -36,7 +68,7 @@ app.get("/events", async (req, res) => {
 
     const events = [];
 
-    $(".show-card, .expedition-event-item").each((i, el) => {
+    $(".show-card, .expedition-event-item, .show-item, .event-block, .event-listing").each((i, el) => {
       const title = $(el).find(".show-card-title, .expedition-event-title").text().trim();
       const category = $(el).find(".show-card-category, .expedition-event-label").text().trim();
       const rawVenue = $(el).find(".show-card-place, .expedition-event-place").text().trim();

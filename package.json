@@ -1,8 +1,7 @@
-
 {
-  "name": "event-api-v5",
+  "name": "event-api-v6",
   "version": "1.0.0",
-  "description": "Taxi Event API - structure v5",
+  "description": "Event API for Tokyo taxi use - v6",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
