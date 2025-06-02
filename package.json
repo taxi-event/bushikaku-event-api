@@ -1,8 +1,8 @@
 
 {
-  "name": "event-api-full75",
+  "name": "event-api-v5",
   "version": "1.0.0",
-  "description": "Taxi Event API - full 75 venues with fuzzy matching",
+  "description": "Taxi Event API - structure v5",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"

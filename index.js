@@ -35,11 +35,12 @@ app.get("/events", async (req, res) => {
     const $ = cheerio.load(data);
 
     const events = [];
-    $(".show-card").each((i, el) => {
-      const title = $(el).find(".show-card-title").text().trim();
-      const category = $(el).find(".show-card-category").text().trim();
-      const rawVenue = $(el).find(".show-card-place").text().trim();
-      const date = $(el).find(".show-card-date").text().trim();
+
+    $(".show-card, .expedition-event-item").each((i, el) => {
+      const title = $(el).find(".show-card-title, .expedition-event-title").text().trim();
+      const category = $(el).find(".show-card-category, .expedition-event-label").text().trim();
+      const rawVenue = $(el).find(".show-card-place, .expedition-event-place").text().trim();
+      const date = $(el).find(".show-card-date, .expedition-event-date").text().trim();
 
       const normalized = normalizeVenueName(rawVenue);
       if (venues.some(v => normalized.includes(v.replace(/\s/g, "")))) {
