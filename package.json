@@ -2,12 +2,13 @@
 {
   "name": "event-api-full75",
   "version": "1.0.0",
+  "description": "Taxi Event API - full 75 venues with fuzzy matching",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "axios": "^1.6.8",
+    "axios": "^1.6.7",
     "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
     "express": "^4.18.2"
