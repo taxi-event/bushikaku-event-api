@@ -12,10 +12,7 @@ const tomorrow = new Date();
 tomorrow.setDate(today.getDate() + 1);
 
 function formatDate(date) {
-  const yyyy = date.getFullYear();
-  const m = date.getMonth() + 1;
-  const d = date.getDate();
-  return `${m}/${d}`;
+  return date.toISOString().split("T")[0];
 }
 
 async function getTokyoDomeEvents() {
@@ -26,21 +23,18 @@ async function getTokyoDomeEvents() {
 
   $(".event-schedule__item").each((i, el) => {
     const rawDate = $(el).find(".event-schedule__date").text().trim();
-    const date = rawDate.replace(/[年月]/g, "/").replace("日", "").trim();
+    const date = rawDate.replace(/[年月]/g, "-").replace("日", "").trim();
     const title = $(el).find(".event-schedule__title").text().trim();
     const rawTime = $(el).find(".event-schedule__time").text().trim();
 
-    console.log(`東京ドーム rawDate=${rawDate} → date=${date}`);
-
-    if (date === formatDate(today) || date === formatDate(tomorrow)) {
-      events.push({
-        date,
-        time: rawTime || "要確認",
-        venue: "東京ドーム",
-        category: "イベント",
-        title,
-      });
-    }
+    events.push({
+      rawDate,
+      date,
+      time: rawTime || "要確認",
+      venue: "東京ドーム",
+      category: "イベント",
+      title
+    });
   });
 
   console.log("東京ドーム: ", events.length, "件抽出");
@@ -55,21 +49,18 @@ async function getBlueNoteEvents() {
 
   $(".liveInfoList .list").each((i, el) => {
     const rawDate = $(el).find(".date").text().trim();
-    const date = rawDate.replace(/[年月]/g, "/").replace("日", "").trim();
+    const date = rawDate.replace(/[年月]/g, "-").replace("日", "").trim();
     const artist = $(el).find(".name").text().trim();
     const time = $(el).find(".time").text().trim();
 
-    console.log(`ブルーノート rawDate=${rawDate} → date=${date}`);
-
-    if (date === formatDate(today) || date === formatDate(tomorrow)) {
-      events.push({
-        date,
-        time: time || "要確認",
-        venue: "ブルーノート東京",
-        category: "ライブ",
-        title: artist,
-      });
-    }
+    events.push({
+      rawDate,
+      date,
+      time: time || "要確認",
+      venue: "ブルーノート東京",
+      category: "ライブ",
+      title: artist
+    });
   });
 
   console.log("ブルーノート: ", events.length, "件抽出");
@@ -84,21 +75,18 @@ async function getTokyoInternationalForumEvents() {
 
   $(".eventList .eventItem").each((i, el) => {
     const rawDate = $(el).find(".eventDate").text().trim();
-    const date = rawDate.split("（")[0].replace(/[年月]/g, "/").replace("日", "").trim();
+    const date = rawDate.split("（")[0].trim();
     const title = $(el).find(".eventTitle").text().trim();
     const time = $(el).find(".eventTime").text().trim();
 
-    console.log(`フォーラム rawDate=${rawDate} → date=${date}`);
-
-    if (date === formatDate(today) || date === formatDate(tomorrow)) {
-      events.push({
-        date,
-        time: time || "要確認",
-        venue: "東京国際フォーラム",
-        category: "イベント",
-        title,
-      });
-    }
+    events.push({
+      rawDate,
+      date,
+      time: time || "要確認",
+      venue: "東京国際フォーラム",
+      category: "イベント",
+      title
+    });
   });
 
   console.log("フォーラム: ", events.length, "件抽出");
@@ -113,7 +101,7 @@ app.get("/events", async (req, res) => {
       getTokyoInternationalForumEvents()
     ]);
     const events = [...dome, ...blueNote, ...tif];
-    res.json({ status: "ok", date: new Date().toISOString(), debug: true, count: events.length, events });
+    res.json({ status: "ok", date: new Date().toISOString(), count: events.length, debug: true, events });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
   }
