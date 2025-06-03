@@ -1,4 +1,4 @@
-// index.js（デバッグ用ログ追加）
+// ✅ 修正済み index.js 全文
 const express = require("express");
 const axios = require("axios");
 const cheerio = require("cheerio");
@@ -12,11 +12,8 @@ const today = new Date();
 const tomorrow = new Date();
 tomorrow.setDate(today.getDate() + 1);
 
-function formatDate(date) {
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const dd = String(date.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
+function formatJapaneseDate(date) {
+  return `${date.getMonth() + 1}月${date.getDate()}日`;
 }
 
 async function getTokyoDomeEvents() {
@@ -24,19 +21,18 @@ async function getTokyoDomeEvents() {
   const { data } = await axios.get(url);
   const $ = cheerio.load(data);
   const events = [];
+  const todayJP = formatJapaneseDate(today);
+  const tomorrowJP = formatJapaneseDate(tomorrow);
 
-  console.log("[東京ドーム] today:", formatDate(today));
-  console.log("[東京ドーム] tomorrow:", formatDate(tomorrow));
+  console.log("[東京ドーム] today:", todayJP);
+  console.log("[東京ドーム] tomorrow:", tomorrowJP);
 
   $(".event-schedule__item").each((i, el) => {
-    const rawDate = $(el).find(".event-schedule__date").text().trim();
-    const date = rawDate.replace(/[年月]/g, "-").replace("日", "").trim();
+    const date = $(el).find(".event-schedule__date").text().trim();
     const title = $(el).find(".event-schedule__title").text().trim();
     const rawTime = $(el).find(".event-schedule__time").text().trim();
 
-    console.log("[東京ドーム] rawDate:", rawDate, "→", date);
-
-    if (date === formatDate(today) || date === formatDate(tomorrow)) {
+    if (date.includes(todayJP) || date.includes(tomorrowJP)) {
       events.push({
         date,
         time: rawTime || "要確認",
@@ -56,21 +52,20 @@ async function getBlueNoteEvents() {
   const { data } = await axios.get(url);
   const $ = cheerio.load(data);
   const events = [];
+  const todayJP = formatJapaneseDate(today);
+  const tomorrowJP = formatJapaneseDate(tomorrow);
 
-  console.log("[ブルーノート] today:", formatDate(today));
-  console.log("[ブルーノート] tomorrow:", formatDate(tomorrow));
+  console.log("[ブルーノート] today:", todayJP);
+  console.log("[ブルーノート] tomorrow:", tomorrowJP);
 
   $(".liveInfoList .list").each((i, el) => {
-    const rawDate = $(el).find(".date").text().trim();
-    const date = rawDate.replace(/[年月]/g, "-").replace("日", "").trim();
+    const dateText = $(el).find(".date").text().trim();
     const artist = $(el).find(".name").text().trim();
     const time = $(el).find(".time").text().trim();
 
-    console.log("[ブルーノート] rawDate:", rawDate, "→", date);
-
-    if (date === formatDate(today) || date === formatDate(tomorrow)) {
+    if (dateText.includes(todayJP) || dateText.includes(tomorrowJP)) {
       events.push({
-        date,
+        date: dateText,
         time: time || "要確認",
         venue: "ブルーノート東京",
         category: "ライブ",
@@ -88,19 +83,18 @@ async function getTokyoInternationalForumEvents() {
   const { data } = await axios.get(url);
   const $ = cheerio.load(data);
   const events = [];
+  const todayJP = formatJapaneseDate(today);
+  const tomorrowJP = formatJapaneseDate(tomorrow);
 
-  console.log("[フォーラム] today:", formatDate(today));
-  console.log("[フォーラム] tomorrow:", formatDate(tomorrow));
+  console.log("[フォーラム] today:", todayJP);
+  console.log("[フォーラム] tomorrow:", tomorrowJP);
 
   $(".eventList .eventItem").each((i, el) => {
-    const rawDate = $(el).find(".eventDate").text().trim();
-    const date = rawDate.split("（")[0];
+    const date = $(el).find(".eventDate").text().trim();
     const title = $(el).find(".eventTitle").text().trim();
     const time = $(el).find(".eventTime").text().trim();
 
-    console.log("[フォーラム] rawDate:", rawDate, "→", date);
-
-    if (date === formatDate(today) || date === formatDate(tomorrow)) {
+    if (date.includes(todayJP) || date.includes(tomorrowJP)) {
       events.push({
         date,
         time: time || "要確認",
